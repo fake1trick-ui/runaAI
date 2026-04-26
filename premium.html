@@ -463,24 +463,24 @@
   <section class="hero">
     <div class="badge">✦ Exclusive Collection</div>
     <h1>Premium</h1>
-    <p>厳選されたハイクオリティAI美女画像コレクション。BOOTHにて限定販売中。</p>
+    <p>厳選されたハイクオリティAI美女画像コレクション。月額500円で全作品が見放題。</p>
     <div class="divider"></div>
   </section>
 
   <!-- CTA Banner -->
   <div class="cta-banner">
     <h2>Unlock the Full Collection</h2>
-    <p>高解像度・透かしなしのプレミアム画像セットをBOOTHでご購入いただけます。</p>
+    <p>月額500円で高解像度・透かしなしのプレミアム画像が見放題。いつでも解約可能。</p>
     <div class="features">
       <div class="feature"><span class="check">✓</span> 高解像度 4K</div>
       <div class="feature"><span class="check">✓</span> 透かしなし</div>
       <div class="feature"><span class="check">✓</span> 商用利用可</div>
-      <div class="feature"><span class="check">✓</span> 限定コンテンツ</div>
+      <div class="feature"><span class="check">✓</span> 月額500円・いつでも解約</div>
     </div>
-    <a href="https://booth.pm/" target="_blank" rel="noopener" class="btn-booth" id="main-booth-btn">
+    <button class="btn-booth" id="main-booth-btn" onclick="startCheckout()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      BOOTHで購入する
-    </a>
+      月額500円で始める
+    </button>
   </div>
 
   <!-- Locked Gallery -->
@@ -494,9 +494,9 @@
 
   <!-- Floating CTA -->
   <div class="floating-cta">
-    <a href="https://booth.pm/" target="_blank" rel="noopener">
+    <a href="#" onclick="startCheckout(); return false;">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-      BOOTHで購入
+      月額500円で始める
     </a>
   </div>
 
@@ -562,16 +562,27 @@
           </div>
         </div>
       `;
-      // Click on locked card → BOOTH
-      card.addEventListener('click', () => {
-        window.open('https://booth.pm/', '_blank');
-      });
+      card.addEventListener('click', () => startCheckout());
       grid.appendChild(card);
     });
 
-    // ─── Update BOOTH links ───
-    // TODO: Replace 'https://booth.pm/' with your actual BOOTH product URL
-    // e.g., 'https://your-shop.booth.pm/items/123456'
+    async function startCheckout() {
+      const btn = document.getElementById('main-booth-btn');
+      if (btn) { btn.textContent = '処理中...'; btn.disabled = true; }
+      try {
+        const res = await fetch('/api/checkout', { method: 'POST' });
+        const data = await res.json();
+        if (data.url) {
+          window.location.href = data.url;
+        } else {
+          alert('エラーが発生しました。しばらくしてお試しください。');
+          if (btn) { btn.textContent = '月額500円で始める'; btn.disabled = false; }
+        }
+      } catch (e) {
+        alert('エラーが発生しました。しばらくしてお試しください。');
+        if (btn) { btn.textContent = '月額500円で始める'; btn.disabled = false; }
+      }
+    }
   </script>
 </body>
 </html>

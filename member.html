@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LUMIÈRE — Member Gallery</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0a0a; --bg-card: #141414;
+      --gold: #c9a96e; --gold-light: #e0c88a;
+      --text: #e8e8e8; --text-muted: #888;
+      --serif: 'Cormorant Garamond', Georgia, serif;
+      --sans: 'Noto Sans JP', 'Helvetica Neue', sans-serif;
+    }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); font-weight: 300; min-height: 100vh; }
+
+    /* ── Verifying screen ── */
+    #verify-screen {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; gap: 20px;
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 2px solid #333;
+      border-top-color: var(--gold); border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Main content ── */
+    #main-content { display: none; }
+
+    header {
+      padding: 24px 40px; display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .logo { font-family: var(--serif); font-size: 1.8rem; color: var(--gold); letter-spacing: 0.15em; }
+    .member-badge {
+      background: linear-gradient(135deg, var(--gold-light, #e0c88a), var(--gold));
+      color: #0a0a0a; padding: 6px 16px; border-radius: 20px;
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em;
+    }
+
+    .hero { text-align: center; padding: 60px 20px 40px; }
+    .hero h1 { font-family: var(--serif); font-size: clamp(2.5rem, 6vw, 4.5rem); color: var(--gold); font-weight: 400; }
+    .hero p { color: var(--text-muted); margin-top: 12px; font-size: 0.9rem; letter-spacing: 0.05em; }
+
+    .gallery-section { max-width: 1400px; margin: 0 auto; padding: 20px 24px 80px; }
+    .section-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #1e1e1e; }
+    .section-title { font-family: var(--serif); font-size: 1.6rem; color: var(--gold); font-weight: 400; }
+    .section-count { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.12em; }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .gallery-item { position: relative; border-radius: 4px; overflow: hidden; background: var(--bg-card); cursor: pointer; }
+    .gallery-item .img-wrapper { position: relative; aspect-ratio: 3/4; overflow: hidden; }
+    .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; display: block; }
+    .gallery-item:hover img { transform: scale(1.04); }
+    .img-overlay {
+      position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+      opacity: 0; transition: opacity 0.3s; display: flex; flex-direction: column;
+      justify-content: flex-end; padding: 20px;
+    }
+    .gallery-item:hover .img-overlay { opacity: 1; }
+    .img-title { font-family: var(--serif); font-size: 1.1rem; color: #fff; }
+    .btn-dl {
+      margin-top: 10px; padding: 8px 16px; background: var(--gold); color: #0a0a0a;
+      border: none; border-radius: 2px; font-size: 0.78rem; font-weight: 700;
+      cursor: pointer; letter-spacing: 0.08em; width: 100%; transition: background 0.2s;
+    }
+    .btn-dl:hover { background: var(--gold-light, #e0c88a); }
+
+    footer { text-align: center; padding: 40px 20px; border-top: 1px solid #1e1e1e; color: var(--text-muted); font-size: 0.8rem; }
+    footer a { color: var(--gold); text-decoration: none; }
+
+    /* ── Denied screen ── */
+    #denied-screen {
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 100vh; gap: 16px; text-align: center; padding: 40px;
+    }
+    #denied-screen h2 { font-family: var(--serif); color: var(--gold); font-size: 2rem; }
+    #denied-screen p { color: var(--text-muted); max-width: 400px; }
+    #denied-screen a { color: var(--gold); }
+  </style>
+</head>
+<body>
+
+  <div id="verify-screen">
+    <div class="spinner"></div>
+    <p style="color: #888; font-size: 0.85rem; letter-spacing: 0.08em;">認証中...</p>
+  </div>
+
+  <div id="denied-screen">
+    <h2>アクセスできません</h2>
+    <p>有効なサブスクリプションが見つかりませんでした。</p>
+    <p style="margin-top: 16px;"><a href="premium.html">← プレミアムページへ戻る</a></p>
+  </div>
+
+  <div id="main-content">
+    <header>
+      <div class="logo">LUMIÈRE</div>
+      <span class="member-badge">✦ MEMBER</span>
+    </header>
+
+    <section class="hero">
+      <h1>Member Gallery</h1>
+      <p>プレミアム会員限定コレクション</p>
+    </section>
+
+    <section class="gallery-section">
+      <div class="section-header">
+        <h2 class="section-title">Premium Collection</h2>
+        <span class="section-count" id="img-count"></span>
+      </div>
+      <div class="gallery-grid" id="member-gallery"></div>
+    </section>
+
+    <footer>
+      <p>&copy; 2026 LUMIÈRE. All images are AI-generated.</p>
+      <p style="margin-top: 8px;"><a href="index.html">← Free Gallery</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // 画像データ（src を実際のパスに差し替えてください）
+    const memberImages = [
+      { id: 1,  title: 'Royal Ember',    src: 'images/premium/01.jpg' },
+      { id: 2,  title: 'Opulent Dusk',   src: 'images/premium/02.jpg' },
+      { id: 3,  title: 'Gilded Reverie', src: 'images/premium/03.jpg' },
+      { id: 4,  title: 'Crimson Veil',   src: 'images/premium/04.jpg' },
+      { id: 5,  title: 'Ivory Cascade',  src: 'images/premium/05.jpg' },
+      { id: 6,  title: 'Amber Mirage',   src: 'images/premium/06.jpg' },
+      { id: 7,  title: 'Sapphire Night', src: 'images/premium/07.jpg' },
+      { id: 8,  title: 'Pearl Whisper',  src: 'images/premium/08.jpg' },
+      { id: 9,  title: 'Obsidian Grace', src: 'images/premium/09.jpg' },
+      { id: 10, title: 'Champagne Haze', src: 'images/premium/10.jpg' },
+      { id: 11, title: 'Rose Quartz',    src: 'images/premium/11.jpg' },
+      { id: 12, title: 'Platinum Aura',  src: 'images/premium/12.jpg' },
+    ];
+
+    async function verify() {
+      const params = new URLSearchParams(window.location.search);
+      const sessionId = params.get('session_id');
+      const customerId = localStorage.getItem('lumiere_customer_id');
+
+      try {
+        let url = '/api/verify';
+        if (sessionId) url += `?session_id=${sessionId}`;
+        else if (customerId) url += `?customer_id=${customerId}`;
+        else return showDenied();
+
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.valid) {
+          if (data.customer_id) localStorage.setItem('lumiere_customer_id', data.customer_id);
+          // セッションIDをURLから消す
+          if (sessionId) history.replaceState({}, '', '/member.html');
+          showMember();
+        } else {
+          showDenied();
+        }
+      } catch (e) {
+        showDenied();
+      }
+    }
+
+    function showMember() {
+      document.getElementById('verify-screen').style.display = 'none';
+      document.getElementById('main-content').style.display = 'block';
+      renderGallery();
+    }
+
+    function showDenied() {
+      document.getElementById('verify-screen').style.display = 'none';
+      document.getElementById('denied-screen').style.display = 'flex';
+    }
+
+    function renderGallery() {
+      const grid = document.getElementById('member-gallery');
+      document.getElementById('img-count').textContent = `${memberImages.length} IMAGES`;
+
+      memberImages.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'gallery-item';
+        card.innerHTML = `
+          <div class="img-wrapper">
+            <img src="${item.src}" alt="${item.title}" loading="lazy">
+            <div class="img-overlay">
+              <span class="img-title">${item.title}</span>
+              <button class="btn-dl" onclick="downloadImage('${item.src}', '${item.title}')">ダウンロード</button>
+            </div>
+          </div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    function downloadImage(src, title) {
+      const a = document.createElement('a');
+      a.href = src;
+      a.download = title + '.jpg';
+      a.click();
+    }
+
+    verify();
+  </script>
+</body>
+</html>
